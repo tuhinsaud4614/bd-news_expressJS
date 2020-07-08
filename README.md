@@ -15,3 +15,6 @@ The project is developed by various technology. The purpose of the project is pr
 ## Mobile Development Platforms
 > Flutter \
 > React Native
+
+#### Languages
+<kbd>Typescript, Dart</kbd>
