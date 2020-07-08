@@ -1,0 +1,40 @@
+{
+  "name": "bd-news-headlines",
+  "version": "1.0.0",
+  "description": "This will provide the headlines of all bangladeshi newspapers",
+  "main": "dist/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon dist/app.js"
+  },
+  "author": "Md. Tuhin Saud",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/body-parser": "^1.19.0",
+    "@types/cheerio": "^0.22.18",
+    "@types/cron": "^1.7.2",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.6",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/mongoose": "^5.7.28",
+    "@types/node": "^14.0.14",
+    "@types/request": "^2.48.5",
+    "@types/request-promise": "^4.1.46",
+    "@types/uuid": "^8.0.0",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cheerio": "^1.0.0-rc.3",
+    "cron": "^1.8.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.20",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
+    "uuid": "^8.2.0"
+  }
+}
