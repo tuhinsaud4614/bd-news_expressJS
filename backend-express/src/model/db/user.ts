@@ -1,3 +1,4 @@
+import { INews } from "./news";
 import { Schema, model, Document, Types } from "mongoose";
 
 export interface IUser extends Document {
@@ -30,6 +31,7 @@ export const UserModel = model<IUser>("User", user);
 export interface IComment extends Document {
   text: string;
   commenter: IUser | Types.ObjectId;
+  news: INews | Types.ObjectId;
 }
 
 const comment = new Schema<IComment>({
@@ -40,6 +42,10 @@ const comment = new Schema<IComment>({
   commenter: {
     type: Schema.Types.ObjectId,
     ref: "User",
+  },
+  news: {
+    type: Schema.Types.ObjectId,
+    ref: "News",
   },
 });
 

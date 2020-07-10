@@ -1,6 +1,8 @@
+import { MulterError } from "multer";
 import path from "path";
+import { unlink } from "fs";
 import { config } from "dotenv";
-import express, {Request, Response, NextFunction} from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { connect } from "mongoose";
 import { json, urlencoded } from "body-parser";
 
@@ -13,7 +15,7 @@ config();
 
 const app = express();
 
-app.use("/", express.static(path.join(__dirname, "..", "public")));
+app.use(express.static(path.join(__dirname, "..", "/public")));
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
@@ -25,13 +27,35 @@ app.use((_: Request, __: Response, next: NextFunction) => {
   next(new HttpError("Could not find this route.", 404));
 });
 
-// error handling middleware
-app.use((err: HttpError, _: Request, res: Response, next: NextFunction) => {
+// Http error handling middleware
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+  if (req.file) {
+    unlink(req.file.path, (err) => {
+      console.log("File Error", err);
+    });
+  }
+
+  if (
+    err instanceof MulterError &&
+    (<MulterError>err).code === "LIMIT_FILE_SIZE"
+  ) {
+    res.status(400).json({
+      errors: {
+        status: 400,
+        message: (<MulterError>err).message,
+      },
+    });
+  }
+
   if (res.headersSent) {
     return next(err);
   }
+
   res.status(err.code || 500).json({
-    message: err.message || "An unknown error occurred!",
+    errors: {
+      status: err.code || 500,
+      message: err.message || "An unknown error occurred!",
+    },
   });
 });
 

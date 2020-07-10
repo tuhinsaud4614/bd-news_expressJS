@@ -1,11 +1,10 @@
-import { IComment, IUser } from "./../model/db/user";
 import { NewsType } from "../model/newspaper";
 import { RequestHandler } from "express";
 
 import { News } from "../model/newspaper";
-import { Comment } from "../model/comment";
 import { NewsModel, INews } from "../model/db/news";
 import HttpError from "../model/http-error";
+import { Types } from "mongoose";
 
 const convertToNews = (news: INews) => {
   const newNews = new News(
@@ -21,17 +20,7 @@ const convertToNews = (news: INews) => {
     news.updatedDate,
     news.imageUri,
     news.imageCaption,
-    (<IComment[]>news.comments).map(
-      (cnt) =>
-        new Comment(
-          cnt.text,
-          {
-            name: (<IUser>cnt.commenter).name,
-            avatar: (<IUser>cnt.commenter).avatar || "",
-          },
-          cnt._id
-        )
-    ),
+    (news.comments as Types.ObjectId[]).map((cI) => cI.toHexString()),
     news._id
   );
   return newNews;
@@ -41,12 +30,7 @@ export const allHeadlines: RequestHandler = async (_, res, next) => {
   try {
     const allHl = await NewsModel.find({
       newsType: NewsType.HEADLINES,
-    })
-      .populate({
-        path: "comments",
-        populate: { path: "commenter", select: "name avatar" },
-      })
-      .exec();
+    }).exec();
     res.json({
       data: allHl.map((headline) => convertToNews(headline)),
     });
@@ -60,12 +44,8 @@ export const allTopStories: RequestHandler = async (_, res, next) => {
   try {
     const allTS = await NewsModel.find({
       newsType: NewsType.TOP_STORIES,
-    })
-      .populate({
-        path: "comments",
-        populate: { path: "commenter", select: "name avatar" },
-      })
-      .exec();
+    }).exec();
+
     res.json({
       data: allTS.map((topStory) => convertToNews(topStory)),
     });

@@ -3,7 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const multer_1 = require("multer");
 const path_1 = __importDefault(require("path"));
+const fs_1 = require("fs");
 const dotenv_1 = require("dotenv");
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = require("mongoose");
@@ -14,7 +16,7 @@ const user_routes_1 = __importDefault(require("./routes/user-routes"));
 const http_error_1 = __importDefault(require("./model/http-error"));
 dotenv_1.config();
 const app = express_1.default();
-app.use("/", express_1.default.static(path_1.default.join(__dirname, "..", "public")));
+app.use(express_1.default.static(path_1.default.join(__dirname, "..", "/public")));
 app.use(body_parser_1.urlencoded({ extended: true }));
 app.use(body_parser_1.json());
 app.use("/api/news", news_routes_1.default);
@@ -23,13 +25,30 @@ app.use("/api/user", user_routes_1.default);
 app.use((_, __, next) => {
     next(new http_error_1.default("Could not find this route.", 404));
 });
-// error handling middleware
-app.use((err, _, res, next) => {
+// Http error handling middleware
+app.use((err, req, res, next) => {
+    if (req.file) {
+        fs_1.unlink(req.file.path, (err) => {
+            console.log("File Error", err);
+        });
+    }
+    if (err instanceof multer_1.MulterError &&
+        err.code === "LIMIT_FILE_SIZE") {
+        res.status(400).json({
+            errors: {
+                status: 400,
+                message: err.message,
+            },
+        });
+    }
     if (res.headersSent) {
         return next(err);
     }
     res.status(err.code || 500).json({
-        message: err.message || "An unknown error occurred!",
+        errors: {
+            status: err.code || 500,
+            message: err.message || "An unknown error occurred!",
+        },
     });
 });
 const host = process.env.HOST || "localhost";

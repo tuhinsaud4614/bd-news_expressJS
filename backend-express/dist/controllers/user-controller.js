@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const news_1 = require("./../model/db/news");
-const user_1 = require("./../model/db/user");
 const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
+const news_1 = require("./../model/db/news");
+const user_1 = require("./../model/db/user");
 const http_error_1 = __importDefault(require("../model/http-error"));
+const mongoose_1 = require("mongoose");
 exports.createUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
@@ -65,19 +66,36 @@ exports.login = async (req, res, next) => {
         return next(new http_error_1.default("User creation failed!", 401));
     }
 };
+exports.updateAvatar = async (req, res, next) => {
+    user_1.UserModel.findOneAndUpdate({ _id: req.userId }, { avatar: `images/users/${req.file.filename}` }, (err, updatedUser) => {
+        if (err) {
+            return next(new http_error_1.default("User Avatar not updated!", 400));
+        }
+        if (!updatedUser) {
+            return next(new http_error_1.default("Comment not exists!", 404));
+        }
+        res.json({
+            message: "User Avatar updated successfully!",
+            updateComment: updatedUser._id,
+        });
+    });
+};
 exports.createComment = async (req, res, next) => {
     try {
         const { text, newsId } = req.body;
         const user = await user_1.UserModel.findById(req.userId);
         const news = await news_1.NewsModel.findById(newsId);
         if (user && news) {
+            const sess = await mongoose_1.startSession();
+            sess.startTransaction();
             const resComment = await new user_1.CommentModel({
                 text: text,
                 commenter: user,
-                news: newsId,
+                news: news,
             }).save();
             news.comments.push(resComment._id);
             await news.save();
+            sess.commitTransaction();
             res.status(201).json({
                 message: "Comment created successfully!",
                 comment: resComment._id,

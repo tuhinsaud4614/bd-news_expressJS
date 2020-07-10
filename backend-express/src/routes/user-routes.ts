@@ -1,19 +1,39 @@
-import { isAuth } from "./../middleware/is-auth";
 import { Router } from "express";
+
+import { imageUpload } from "./../middleware/image-upload";
+import { isAuth } from "./../middleware/is-auth";
 import {
   createUser,
-  createComment,
   login,
+  updateAvatar,
+} from "../controllers/users/auth-controller";
+import {
+  createComment,
   editComment,
   deleteComment,
-} from "../controllers/user-controller";
+  allComments,
+} from "../controllers/users/comment-controller";
 
 const router = Router();
 
 router.post("/create-user", createUser);
+
 router.post("/login", login);
+
+router.patch(
+  "/update-avatar",
+  isAuth,
+  imageUpload("public/images/users/").single("avatar"),
+  updateAvatar
+);
+
+// Get all comments for specific news
+router.get("/comments/:newsId", allComments);
+
 router.post("/comment", isAuth, createComment);
+
 router.patch("/comment/:id", isAuth, editComment);
+
 router.delete("/comment/:id", isAuth, deleteComment);
 
 export default router;

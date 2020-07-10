@@ -25,7 +25,7 @@ export class News {
     public updatedDate: string | null = null,
     public imageUri: string | null = null,
     public imageCaption: string | null = null,
-    public comments: Comment[] = [],
+    public comments: string[] | Comment[] = [],
     public id: string = ""
   ) {}
 

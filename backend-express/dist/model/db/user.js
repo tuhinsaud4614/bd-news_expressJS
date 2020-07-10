@@ -27,5 +27,9 @@ const comment = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "User",
     },
+    news: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "News",
+    },
 });
 exports.CommentModel = mongoose_1.model("Comment", comment);
