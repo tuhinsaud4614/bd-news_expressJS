@@ -1,3 +1,8 @@
+import {
+  resetPassword,
+  resetPinConfirmation,
+  resetNewPassword,
+} from "./../controllers/users/auth-controller";
 import { Router } from "express";
 
 import { imageUpload } from "./../middleware/image-upload";
@@ -19,6 +24,12 @@ const router = Router();
 router.post("/create-user", createUser);
 
 router.post("/login", login);
+
+router.post("/reset-password", resetPassword);
+
+router.post("/reset-pin-confirmation/:userId", resetPinConfirmation);
+
+router.patch("/reset-new-password/:userId", resetNewPassword);
 
 router.patch(
   "/update-avatar",

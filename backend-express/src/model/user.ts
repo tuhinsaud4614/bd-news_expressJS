@@ -5,6 +5,9 @@ export class User {
     public email: string,
     public avatar: string | null,
     public address: string | null,
+    public resetToken: string | undefined,
+    public resetTokenExp: string | undefined,
+    public resetTokenIsVerified: boolean | undefined,
     public id: string = ""
   ) {}
 

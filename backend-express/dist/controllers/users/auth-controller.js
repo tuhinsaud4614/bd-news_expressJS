@@ -6,8 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const validator_1 = __importDefault(require("validator"));
+const nodemailer_1 = require("nodemailer");
 const user_1 = require("../../model/db/user");
 const http_error_1 = __importDefault(require("../../model/http-error"));
+// mail sender protocol
+const transporter = nodemailer_1.createTransport({
+    service: "gmail",
+    auth: {
+        user: "choykuri.python3@gmail.com",
+        pass: "t01738518953",
+    },
+});
 exports.createUser = async (req, res, next) => {
     let { name, email, password } = req.body;
     name = name.replace(/\s+/, " ").trim();
@@ -86,6 +95,130 @@ exports.login = async (req, res, next) => {
     catch (error) {
         console.log("Create user error & error is", error);
         return next(new http_error_1.default("User creation failed!", 401));
+    }
+};
+exports.resetPassword = async (req, res, next) => {
+    let { email } = req.body;
+    email = email.trim();
+    if (validator_1.default.isEmpty(email)) {
+        return next(new http_error_1.default("Field can't be empty!", 422));
+    }
+    if (!validator_1.default.isEmail(email)) {
+        return next(new http_error_1.default("Invalid email!", 422));
+    }
+    try {
+        const user = await user_1.UserModel.findOne({ email: email }).exec();
+        if (!user) {
+            return next(new http_error_1.default("User not found!", 404));
+        }
+        const resetToken = Math.floor(Math.random() * 999999);
+        const resetTokenExp = new Date(Date.now() + 3600000);
+        const resetTokenExpLocal = resetTokenExp.toLocaleString("en-US", {
+            timeZone: "Asia/Dhaka",
+        });
+        const hasToken = await bcryptjs_1.hash(resetToken.toString(), 12);
+        user.resetToken = hasToken;
+        user.resetTokenExp = resetTokenExp;
+        const mailOptions = {
+            from: "BD News <choykuri.python3@gmail.com>",
+            to: email,
+            subject: "Reset Password Confirmation",
+            html: `
+        <h4>BD News portal (Password Reset Pin)</h4>
+        <p> Your reset pin is ${resetToken}.</p> 
+        <p> Your reset pin will expire ${resetTokenExpLocal} (GMT +6).</p> 
+      `,
+        };
+        transporter.sendMail(mailOptions, async (err, _) => {
+            if (err) {
+                console.log("Reset password error & error is", err);
+                return next(new http_error_1.default("Reset password pin sending error!", 500));
+            }
+            else {
+                try {
+                    const { _id } = await user.save();
+                    return res.status(201).json({
+                        message: "Reset password pin sent successfully!",
+                        userId: _id,
+                    });
+                }
+                catch (e) {
+                    console.log("Reset password error & error is", err);
+                    return next(new http_error_1.default("Reset password pin sending error!", 500));
+                }
+            }
+        });
+    }
+    catch (err) {
+        console.log("Reset password error & error is", err);
+        return next(new http_error_1.default("Something went wrong!", 500));
+    }
+};
+exports.resetPinConfirmation = async (req, res, next) => {
+    let { resetPin } = req.body;
+    resetPin = resetPin.trim();
+    if (validator_1.default.isEmpty(resetPin)) {
+        return next(new http_error_1.default("Field can't be empty!", 422));
+    }
+    try {
+        const user = await user_1.UserModel.findOne({ _id: req.params.userId }).exec();
+        if (!user) {
+            return next(new http_error_1.default("User not found!", 404));
+        }
+        if (!user.resetToken ||
+            !user.resetTokenExp ||
+            user.resetTokenExp.getTime() < Date.now())
+            return next(new http_error_1.default("Reset pin is expired!", 400));
+        const isResetPinMatch = await bcryptjs_1.compare(resetPin, user.resetToken);
+        if (!isResetPinMatch) {
+            return next(new http_error_1.default("Invalid reset pin!", 400));
+        }
+        user.resetTokenIsVerified = true;
+        user.resetToken = undefined;
+        user.resetTokenExp = undefined;
+        const { _id } = await user.save();
+        return res.status(201).json({
+            message: "Email is verified!",
+            userId: _id,
+        });
+    }
+    catch (err) {
+        console.log("Reset pin confirmation error & error is", err);
+        return next(new http_error_1.default("Something went wrong!", 500));
+    }
+};
+exports.resetNewPassword = async (req, res, next) => {
+    let { newPassword } = req.body;
+    newPassword = newPassword.trim();
+    if (validator_1.default.isEmpty(newPassword)) {
+        return next(new http_error_1.default("Field can't be empty!", 422));
+    }
+    try {
+        const user = await user_1.UserModel.findOne({ _id: req.params.userId }).exec();
+        if (!user) {
+            return next(new http_error_1.default("User not found!", 404));
+        }
+        if (!user.resetTokenIsVerified) {
+            return next(new http_error_1.default("Email not verified!", 400));
+        }
+        try {
+            const hashPassword = await bcryptjs_1.hash(newPassword, 12);
+            user.password = hashPassword;
+            user.resetTokenIsVerified = undefined;
+            const { _id } = await user.save();
+            return res.status(201).json({
+                message: "Password update successfully!",
+                userId: _id,
+            });
+        }
+        catch (e) {
+            console.log("New password error & error is", e);
+            return next(new http_error_1.default("Password update failed!", 400));
+        }
+    }
+    catch (err) {
+        console.log("New password error & error is", err);
+        return next(new http_error_1.default("Something went wrong!", 500));
     }
 };
 exports.updateAvatar = async (req, res, next) => {

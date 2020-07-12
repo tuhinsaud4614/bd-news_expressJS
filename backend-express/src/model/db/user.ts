@@ -7,6 +7,9 @@ export interface IUser extends Document {
   password: string;
   avatar?: string;
   address?: string;
+  resetToken?: string; 
+  resetTokenExp?: Date;
+  resetTokenIsVerified?: boolean
 }
 
 const user = new Schema<IUser>({
@@ -24,6 +27,9 @@ const user = new Schema<IUser>({
   },
   avatar: String,
   address: String,
+  resetToken: String,
+  resetTokenExp: Date,
+  resetTokenIsVerified: Boolean
 });
 
 export const UserModel = model<IUser>("User", user);

@@ -16,6 +16,9 @@ const user = new mongoose_1.Schema({
     },
     avatar: String,
     address: String,
+    resetToken: String,
+    resetTokenExp: Date,
+    resetTokenIsVerified: Boolean
 });
 exports.UserModel = mongoose_1.model("User", user);
 const comment = new mongoose_1.Schema({
