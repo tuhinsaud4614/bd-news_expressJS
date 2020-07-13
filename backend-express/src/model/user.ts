@@ -1,4 +1,4 @@
-import { NewspaperName } from "./newspaper";
+import { News } from "./newspaper";
 export class User {
   constructor(
     public name: string,
@@ -23,14 +23,14 @@ export class User {
 
 export class Favorite {
   constructor(
-    public newsies: NewspaperName[],
+    public news: News,
     public user: User,
     public id: string = ""
   ) {}
 
   get topMap() {
     return {
-      news: this.newsies,
+      news: this.news,
       user: this.user,
     };
   }

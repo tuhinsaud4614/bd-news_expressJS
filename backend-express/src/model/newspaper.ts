@@ -1,3 +1,4 @@
+import { Favorite } from './user';
 import {Comment} from "./comment"
 
 export enum NewspaperName {
@@ -26,6 +27,7 @@ export class News {
     public imageUri: string | null = null,
     public imageCaption: string | null = null,
     public comments: string[] | Comment[] = [],
+    public favorites: string[] | Favorite[] = [],
     public id: string = ""
   ) {}
 
@@ -44,6 +46,7 @@ export class News {
       imageUri: this.imageUri,
       imageCaption: this.imageCaption,
       comments: [],
+      favorite: [],
     };
   }
 }

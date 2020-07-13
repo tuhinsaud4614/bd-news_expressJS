@@ -22,14 +22,14 @@ class User {
 }
 exports.User = User;
 class Favorite {
-    constructor(newsies, user, id = "") {
-        this.newsies = newsies;
+    constructor(news, user, id = "") {
+        this.news = news;
         this.user = user;
         this.id = id;
     }
     get topMap() {
         return {
-            news: this.newsies,
+            news: this.news,
             user: this.user,
         };
     }

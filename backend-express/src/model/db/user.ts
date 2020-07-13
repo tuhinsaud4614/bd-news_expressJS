@@ -7,9 +7,9 @@ export interface IUser extends Document {
   password: string;
   avatar?: string;
   address?: string;
-  resetToken?: string; 
+  resetToken?: string;
   resetTokenExp?: Date;
-  resetTokenIsVerified?: boolean
+  resetTokenIsVerified?: boolean;
 }
 
 const user = new Schema<IUser>({
@@ -29,7 +29,7 @@ const user = new Schema<IUser>({
   address: String,
   resetToken: String,
   resetTokenExp: Date,
-  resetTokenIsVerified: Boolean
+  resetTokenIsVerified: Boolean,
 });
 
 export const UserModel = model<IUser>("User", user);
@@ -56,3 +56,21 @@ const comment = new Schema<IComment>({
 });
 
 export const CommentModel = model<IComment>("Comment", comment);
+
+export interface IFavorite extends Document {
+  user: IUser | Types.ObjectId;
+  news: INews | Types.ObjectId;
+}
+
+const favorite = new Schema<IFavorite>({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  news: {
+    type: Schema.Types.ObjectId,
+    ref: "News",
+  },
+});
+
+export const FavoriteModel = model<IFavorite>("Favorite", favorite);

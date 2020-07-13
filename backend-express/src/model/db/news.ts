@@ -1,6 +1,7 @@
-import { IComment } from "./user";
-import { NewspaperName } from "./../newspaper";
 import { Schema, model, Document, Types } from "mongoose";
+
+import { IComment, IFavorite } from "./user";
+import { NewspaperName } from "./../newspaper";
 import { NewsType } from "../newspaper";
 
 export interface INews extends Document {
@@ -17,6 +18,7 @@ export interface INews extends Document {
   imageCaption?: string;
   description: string[];
   comments: IComment[] | Types.ObjectId[];
+  favorites: IFavorite[] | Types.ObjectId[];
   createdAt: Date;
 }
 
@@ -53,6 +55,12 @@ const news = new Schema<INews>({
     {
       type: Schema.Types.ObjectId,
       ref: "Comment",
+    },
+  ],
+  favorites: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Favorite",
     },
   ],
   createdAt: {

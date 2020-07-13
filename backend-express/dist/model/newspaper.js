@@ -12,7 +12,7 @@ var NewsType;
     NewsType["TOP_STORIES"] = "TOP_STORIES";
 })(NewsType = exports.NewsType || (exports.NewsType = {}));
 class News {
-    constructor(newsType, newspaperName, title, link, description, publishedBy = null, category = null, subTitle = null, publishedDate = null, updatedDate = null, imageUri = null, imageCaption = null, comments = [], id = "") {
+    constructor(newsType, newspaperName, title, link, description, publishedBy = null, category = null, subTitle = null, publishedDate = null, updatedDate = null, imageUri = null, imageCaption = null, comments = [], favorites = [], id = "") {
         this.newsType = newsType;
         this.newspaperName = newspaperName;
         this.title = title;
@@ -26,6 +26,7 @@ class News {
         this.imageUri = imageUri;
         this.imageCaption = imageCaption;
         this.comments = comments;
+        this.favorites = favorites;
         this.id = id;
     }
     get topMap() {
@@ -43,6 +44,7 @@ class News {
             imageUri: this.imageUri,
             imageCaption: this.imageCaption,
             comments: [],
+            favorite: [],
         };
     }
 }

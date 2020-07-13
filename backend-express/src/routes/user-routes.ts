@@ -18,6 +18,7 @@ import {
   deleteComment,
   allComments,
 } from "../controllers/users/comment-controller";
+import { setFavorite, removeFavorite } from "../controllers/users/favorite-controller";
 
 const router = Router();
 
@@ -37,6 +38,7 @@ router.patch(
   updateAvatar
 );
 
+/// Comment Controller
 // Get all comments for specific news
 router.get("/comments/:newsId", allComments);
 
@@ -45,5 +47,10 @@ router.post("/comment", isAuth, createComment);
 router.patch("/comment/:id", isAuth, editComment);
 
 router.delete("/comment/:id", isAuth, deleteComment);
+
+
+/// Favorite Controller
+router.post("/favorite", isAuth, setFavorite);
+router.post("/not-favorite", isAuth, removeFavorite);
 
 export default router;

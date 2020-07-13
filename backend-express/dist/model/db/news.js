@@ -36,6 +36,12 @@ const news = new mongoose_1.Schema({
             ref: "Comment",
         },
     ],
+    favorites: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Favorite",
+        },
+    ],
     createdAt: {
         type: Date,
         default: Date.now,

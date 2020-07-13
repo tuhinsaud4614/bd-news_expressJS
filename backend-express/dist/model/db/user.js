@@ -18,7 +18,7 @@ const user = new mongoose_1.Schema({
     address: String,
     resetToken: String,
     resetTokenExp: Date,
-    resetTokenIsVerified: Boolean
+    resetTokenIsVerified: Boolean,
 });
 exports.UserModel = mongoose_1.model("User", user);
 const comment = new mongoose_1.Schema({
@@ -36,3 +36,14 @@ const comment = new mongoose_1.Schema({
     },
 });
 exports.CommentModel = mongoose_1.model("Comment", comment);
+const favorite = new mongoose_1.Schema({
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    news: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "News",
+    },
+});
+exports.FavoriteModel = mongoose_1.model("Favorite", favorite);
