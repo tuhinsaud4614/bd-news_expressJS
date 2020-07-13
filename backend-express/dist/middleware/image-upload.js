@@ -12,6 +12,7 @@ const MIME_TYPE = {
     "image/png": "png",
     "image/gif": "gif",
 };
+// 10 mb = 10000000
 const MAX_FILE_SIZE = 10000000;
 exports.imageUpload = (fieldPath) => {
     return multer_1.default({

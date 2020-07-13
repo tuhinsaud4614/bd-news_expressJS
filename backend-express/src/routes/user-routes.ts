@@ -33,8 +33,7 @@ router.patch("/reset-new-password/:userId", resetNewPassword);
 
 router.patch(
   "/update-avatar",
-  isAuth,
-  imageUpload("public/images/users/").single("avatar"),
+  [isAuth, imageUpload("public/images/users/").single("avatar")],
   updateAvatar
 );
 

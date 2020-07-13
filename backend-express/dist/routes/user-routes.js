@@ -12,7 +12,7 @@ router.post("/login", auth_controller_2.login);
 router.post("/reset-password", auth_controller_1.resetPassword);
 router.post("/reset-pin-confirmation/:userId", auth_controller_1.resetPinConfirmation);
 router.patch("/reset-new-password/:userId", auth_controller_1.resetNewPassword);
-router.patch("/update-avatar", is_auth_1.isAuth, image_upload_1.imageUpload("public/images/users/").single("avatar"), auth_controller_2.updateAvatar);
+router.patch("/update-avatar", [is_auth_1.isAuth, image_upload_1.imageUpload("public/images/users/").single("avatar")], auth_controller_2.updateAvatar);
 // Get all comments for specific news
 router.get("/comments/:newsId", comment_controller_1.allComments);
 router.post("/comment", is_auth_1.isAuth, comment_controller_1.createComment);

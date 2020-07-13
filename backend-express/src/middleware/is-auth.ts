@@ -3,6 +3,10 @@ import { verify } from "jsonwebtoken";
 import HttpError from "../model/http-error";
 
 export const isAuth: RequestHandler = (req, _, next) => {
+  if(req.method === "OPTIONS") {
+    return next();
+  }
+
   if (!req.get("Authorization")) {
     return next(new HttpError("Not Authenticated", 401));
   }

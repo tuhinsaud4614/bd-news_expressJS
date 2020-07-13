@@ -1,8 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const news_controllers_1 = require("./../controllers/news-controllers");
 const express_1 = require("express");
-const news_controllers_1 = require("../controllers/news-controllers");
+const news_controllers_2 = require("../controllers/news-controllers");
 const router = express_1.Router();
-router.get("/headlines", news_controllers_1.allHeadlines);
-router.get("/top-stories", news_controllers_1.allTopStories);
+router.get("/headlines", news_controllers_2.allHeadlines);
+router.get("/top-stories", news_controllers_2.allTopStories);
+router.post("/top-stories-by-date", news_controllers_2.topStoriesByDate);
+router.post("/headlines-by-date", news_controllers_1.headlinesByDate);
 exports.default = router;

@@ -9,6 +9,7 @@ const MIME_TYPE: { [key: string]: string } = {
   "image/gif": "gif",
 };
 
+// 10 mb = 10000000
 const MAX_FILE_SIZE = 10000000;
 
 export const imageUpload = (fieldPath: string) => {

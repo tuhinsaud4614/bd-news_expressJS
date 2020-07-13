@@ -19,6 +19,12 @@ const app = express_1.default();
 app.use(express_1.default.static(path_1.default.join(__dirname, "..", "/public")));
 app.use(body_parser_1.urlencoded({ extended: true }));
 app.use(body_parser_1.json());
+app.use((_, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH, DELETE");
+    next();
+});
 app.use("/api/news", news_routes_1.default);
 app.use("/api/user", user_routes_1.default);
 // no route found middleware
@@ -34,7 +40,7 @@ app.use((err, req, res, next) => {
     }
     if (err instanceof multer_1.MulterError &&
         err.code === "LIMIT_FILE_SIZE") {
-        res.status(400).json({
+        return res.status(400).json({
             errors: {
                 status: 400,
                 message: err.message,

@@ -14,10 +14,20 @@ import HttpError from "./model/http-error";
 config();
 
 const app = express();
-
 app.use(express.static(path.join(__dirname, "..", "/public")));
+
 app.use(urlencoded({ extended: true }));
 app.use(json());
+
+app.use((_: Request, res: Response, next: NextFunction) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH, DELETE");
+  next();
+});
 
 app.use("/api/news", newsRoutes);
 app.use("/api/user", userRoutes);
@@ -39,7 +49,7 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
     err instanceof MulterError &&
     (<MulterError>err).code === "LIMIT_FILE_SIZE"
   ) {
-    res.status(400).json({
+    return res.status(400).json({
       errors: {
         status: 400,
         message: (<MulterError>err).message,

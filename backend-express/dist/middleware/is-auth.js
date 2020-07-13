@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = require("jsonwebtoken");
 const http_error_1 = __importDefault(require("../model/http-error"));
 exports.isAuth = (req, _, next) => {
+    if (req.method === "OPTIONS") {
+        return next();
+    }
     if (!req.get("Authorization")) {
         return next(new http_error_1.default("Not Authenticated", 401));
     }
