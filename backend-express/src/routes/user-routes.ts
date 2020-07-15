@@ -2,6 +2,8 @@ import {
   resetPassword,
   resetPinConfirmation,
   resetNewPassword,
+  updateName,
+  updateAddress,
 } from "./../controllers/users/auth-controller";
 import { Router } from "express";
 
@@ -18,7 +20,10 @@ import {
   deleteComment,
   allComments,
 } from "../controllers/users/comment-controller";
-import { setFavorite, removeFavorite } from "../controllers/users/favorite-controller";
+import {
+  setFavorite,
+  removeFavorite,
+} from "../controllers/users/favorite-controller";
 
 const router = Router();
 
@@ -38,6 +43,10 @@ router.patch(
   updateAvatar
 );
 
+router.patch("/update-name", isAuth, updateName);
+
+router.patch("/update-address", isAuth, updateAddress);
+
 /// Comment Controller
 // Get all comments for specific news
 router.get("/comments/:newsId", allComments);
@@ -47,7 +56,6 @@ router.post("/comment", isAuth, createComment);
 router.patch("/comment/:id", isAuth, editComment);
 
 router.delete("/comment/:id", isAuth, deleteComment);
-
 
 /// Favorite Controller
 router.post("/favorite", isAuth, setFavorite);

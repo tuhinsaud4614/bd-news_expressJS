@@ -221,17 +221,64 @@ exports.resetNewPassword = async (req, res, next) => {
         return next(new http_error_1.default("Something went wrong!", 500));
     }
 };
-exports.updateAvatar = async (req, res, next) => {
+exports.updateName = (req, res, next) => {
+    let { name } = req.body;
+    name = name.trim();
+    if (validator_1.default.isEmpty(name)) {
+        res.status(200).json({
+            message: "Name remain same!",
+        });
+    }
+    else if (!/^[A-Za-z\s.]+$/g.test(name)) {
+        next(new http_error_1.default("Invalid name (Only required [a-z])!", 422));
+    }
+    else {
+        user_1.UserModel.findOneAndUpdate({ _id: req.userId }, { name: name }, (err, updatedUser) => {
+            if (err) {
+                return next(new http_error_1.default("User name not updated!", 400));
+            }
+            if (!updatedUser) {
+                return next(new http_error_1.default("User not exists!", 404));
+            }
+            res.status(201).json({
+                message: "User name updated successfully!",
+            });
+        });
+    }
+};
+exports.updateAvatar = (req, res, next) => {
     user_1.UserModel.findOneAndUpdate({ _id: req.userId }, { avatar: `images/users/${req.file.filename}` }, (err, updatedUser) => {
         if (err) {
             return next(new http_error_1.default("User Avatar not updated!", 400));
         }
         if (!updatedUser) {
-            return next(new http_error_1.default("Comment not exists!", 404));
+            return next(new http_error_1.default("User not exists!", 404));
         }
         res.json({
             message: "User Avatar updated successfully!",
             updateComment: updatedUser._id,
         });
     });
+};
+exports.updateAddress = (req, res, next) => {
+    let { address } = req.body;
+    address = address.trim();
+    if (validator_1.default.isEmpty(address)) {
+        res.status(200).json({
+            message: "Address remain same!",
+        });
+    }
+    else {
+        user_1.UserModel.findOneAndUpdate({ _id: req.userId }, { address: address }, (err, updatedUser) => {
+            if (err) {
+                return next(new http_error_1.default("User address not updated!", 400));
+            }
+            if (!updatedUser) {
+                return next(new http_error_1.default("User not exists!", 404));
+            }
+            res.status(201).json({
+                message: "User address updated successfully!",
+            });
+        });
+    }
 };

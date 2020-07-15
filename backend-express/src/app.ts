@@ -72,7 +72,7 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 8000;
 
-connect(process.env.DB_URI! || "mongodb://localhost:27017/bd-news", {
+connect(process.env.DB_URI || "mongodb://localhost:27017/bd-news", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,

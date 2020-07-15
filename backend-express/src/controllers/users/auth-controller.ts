@@ -270,7 +270,38 @@ export const resetNewPassword: RequestHandler<{ userId: string }> = async (
   }
 };
 
-export const updateAvatar: RequestHandler = async (req, res, next) => {
+export const updateName: RequestHandler = (req, res, next) => {
+  let { name } = req.body as { name: string };
+  name = name.trim();
+
+  if (validator.isEmpty(name)) {
+    res.status(200).json({
+      message: "Name remain same!",
+    });
+  } else if (!/^[A-Za-z\s.]+$/g.test(name)) {
+    next(new HttpError("Invalid name (Only required [a-z])!", 422));
+  } else {
+    UserModel.findOneAndUpdate(
+      { _id: req.userId },
+      { name: name },
+      (err, updatedUser) => {
+        if (err) {
+          return next(new HttpError("User name not updated!", 400));
+        }
+
+        if (!updatedUser) {
+          return next(new HttpError("User not exists!", 404));
+        }
+
+        res.status(201).json({
+          message: "User name updated successfully!",
+        });
+      }
+    );
+  }
+};
+
+export const updateAvatar: RequestHandler = (req, res, next) => {
   UserModel.findOneAndUpdate(
     { _id: req.userId },
     { avatar: `images/users/${req.file.filename}` },
@@ -279,7 +310,7 @@ export const updateAvatar: RequestHandler = async (req, res, next) => {
         return next(new HttpError("User Avatar not updated!", 400));
       }
       if (!updatedUser) {
-        return next(new HttpError("Comment not exists!", 404));
+        return next(new HttpError("User not exists!", 404));
       }
       res.json({
         message: "User Avatar updated successfully!",
@@ -287,4 +318,33 @@ export const updateAvatar: RequestHandler = async (req, res, next) => {
       });
     }
   );
+};
+
+export const updateAddress: RequestHandler = (req, res, next) => {
+  let { address } = req.body as { address: string };
+  address = address.trim();
+
+  if (validator.isEmpty(address)) {
+    res.status(200).json({
+      message: "Address remain same!",
+    });
+  } else {
+    UserModel.findOneAndUpdate(
+      { _id: req.userId },
+      { address: address },
+      (err, updatedUser) => {
+        if (err) {
+          return next(new HttpError("User address not updated!", 400));
+        }
+
+        if (!updatedUser) {
+          return next(new HttpError("User not exists!", 404));
+        }
+
+        res.status(201).json({
+          message: "User address updated successfully!",
+        });
+      }
+    );
+  }
 };
