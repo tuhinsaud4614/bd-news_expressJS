@@ -93,8 +93,8 @@ exports.login = async (req, res, next) => {
         }
     }
     catch (error) {
-        console.log("Create user error & error is", error);
-        return next(new http_error_1.default("User creation failed!", 401));
+        console.log("User login error & error is", error);
+        return next(new http_error_1.default("User login failed!", 401));
     }
 };
 exports.resetPassword = async (req, res, next) => {

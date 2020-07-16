@@ -27,3 +27,25 @@ exports.isAuth = (req, _, next) => {
         return next(new http_error_1.default("Not Authenticated", 401));
     }
 };
+exports.isAdminAuth = (req, _, next) => {
+    if (req.method === "OPTIONS") {
+        return next();
+    }
+    if (!req.get("Authorization")) {
+        return next(new http_error_1.default("Admin not authenticated", 401));
+    }
+    const token = req.get("Authorization").split(" ")[1];
+    try {
+        let decodedToken = jsonwebtoken_1.verify(token, process.env.SECRET_OR_KEY_ADMIN || "supersecretadmin");
+        if (typeof decodedToken === "object") {
+            req.adminId = decodedToken.id;
+            next();
+        }
+        else {
+            return next(new http_error_1.default("Admin authentication Failed!", 401));
+        }
+    }
+    catch (err) {
+        return next(new http_error_1.default("Admin not authenticated", 401));
+    }
+};

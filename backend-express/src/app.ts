@@ -5,15 +5,19 @@ import { config } from "dotenv";
 import express, { Request, Response, NextFunction } from "express";
 import { connect } from "mongoose";
 import { json, urlencoded } from "body-parser";
+import compression from "compression";
 
 // import { job } from "./utility/job";
+import HttpError from "./model/http-error";
 import newsRoutes from "./routes/news-routes";
 import userRoutes from "./routes/user-routes";
-import HttpError from "./model/http-error";
+import adminRoutes from "./routes/admin-routes";
 
 config();
 
 const app = express();
+
+app.use(compression());
 app.use(express.static(path.join(__dirname, "..", "/public")));
 
 app.use(urlencoded({ extended: true }));
@@ -31,6 +35,7 @@ app.use((_: Request, res: Response, next: NextFunction) => {
 
 app.use("/api/news", newsRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 // no route found middleware
 app.use((_: Request, __: Response, next: NextFunction) => {

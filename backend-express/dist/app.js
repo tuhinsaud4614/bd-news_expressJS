@@ -10,12 +10,15 @@ const dotenv_1 = require("dotenv");
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = require("mongoose");
 const body_parser_1 = require("body-parser");
+const compression_1 = __importDefault(require("compression"));
 // import { job } from "./utility/job";
+const http_error_1 = __importDefault(require("./model/http-error"));
 const news_routes_1 = __importDefault(require("./routes/news-routes"));
 const user_routes_1 = __importDefault(require("./routes/user-routes"));
-const http_error_1 = __importDefault(require("./model/http-error"));
+const admin_routes_1 = __importDefault(require("./routes/admin-routes"));
 dotenv_1.config();
 const app = express_1.default();
+app.use(compression_1.default());
 app.use(express_1.default.static(path_1.default.join(__dirname, "..", "/public")));
 app.use(body_parser_1.urlencoded({ extended: true }));
 app.use(body_parser_1.json());
@@ -27,6 +30,7 @@ app.use((_, res, next) => {
 });
 app.use("/api/news", news_routes_1.default);
 app.use("/api/user", user_routes_1.default);
+app.use("/api/admin", admin_routes_1.default);
 // no route found middleware
 app.use((_, __, next) => {
     next(new http_error_1.default("Could not find this route.", 404));

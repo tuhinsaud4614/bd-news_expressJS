@@ -112,8 +112,8 @@ export const login: RequestHandler = async (req, res, next) => {
       return next(new HttpError("User Not Found!", 404));
     }
   } catch (error) {
-    console.log("Create user error & error is", error);
-    return next(new HttpError("User creation failed!", 401));
+    console.log("User login error & error is", error);
+    return next(new HttpError("User login failed!", 401));
   }
 };
 
