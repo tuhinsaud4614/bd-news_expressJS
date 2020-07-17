@@ -24,6 +24,7 @@
     "@types/nodemailer": "^6.4.0",
     "@types/request": "^2.48.5",
     "@types/request-promise": "^4.1.46",
+    "@types/sanitize-html": "^1.23.3",
     "@types/uuid": "^8.0.0",
     "@types/validator": "^13.1.0",
     "nodemon": "^2.0.4"
@@ -42,6 +43,7 @@
     "nodemailer": "^6.4.10",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
+    "sanitize-html": "^1.27.1",
     "uuid": "^8.2.0",
     "validator": "^13.1.1"
   }

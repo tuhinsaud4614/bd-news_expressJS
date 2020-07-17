@@ -3,8 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = require("fs");
+const path_1 = require("path");
 const user_1 = require("./../../model/db/user");
 const http_error_1 = __importDefault(require("../../model/http-error"));
+const utility_1 = require("../../utility");
 exports.getAllUsers = async (_, res, next) => {
     try {
         const allUsers = await user_1.UserModel.find().select("-password -__v").exec();
@@ -20,13 +23,16 @@ exports.getAllUsers = async (_, res, next) => {
         return next(new http_error_1.default("Something went wrong!", 500));
     }
 };
-exports.removeUser = async (req, res, next) => {
+exports.removeUser = (req, res, next) => {
     user_1.UserModel.findByIdAndDelete(req.params.userId, (err, user) => {
         if (err) {
             return next(new http_error_1.default("User not deleted!", 400));
         }
         if (!user) {
             return next(new http_error_1.default("Something went wrong!", 400));
+        }
+        if (user.avatar) {
+            fs_1.unlinkSync(path_1.join(utility_1.rootPath, "public", user.avatar));
         }
         res.status(200).json({
             message: "User deleted successfully!",

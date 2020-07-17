@@ -5,8 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
-const validator_1 = __importDefault(require("validator"));
 const nodemailer_1 = require("nodemailer");
+const validator_1 = __importDefault(require("validator"));
+const sanitize_html_1 = __importDefault(require("sanitize-html"));
 const user_1 = require("../../model/db/user");
 const http_error_1 = __importDefault(require("../../model/http-error"));
 // mail sender protocol
@@ -26,6 +27,9 @@ exports.createUser = async (req, res, next) => {
         validator_1.default.isEmpty(email) ||
         validator_1.default.isEmpty(password)) {
         return next(new http_error_1.default("Field can't be empty!", 422));
+    }
+    if (!sanitize_html_1.default(name) || !sanitize_html_1.default(email) || !sanitize_html_1.default(password)) {
+        return next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
     }
     if (!/^[A-Za-z\s]+$/g.test(name)) {
         return next(new http_error_1.default("Invalid name (Only required [a-z])!", 422));
@@ -80,6 +84,8 @@ exports.login = async (req, res, next) => {
                 const token = jsonwebtoken_1.sign({
                     name: currentUser.name,
                     email: currentUser.email,
+                    avatar: currentUser.avatar,
+                    address: currentUser.address,
                     id: currentUser._id,
                 }, process.env.SECRET_OR_KEY || "supersecret", { expiresIn: "1h" });
                 res.status(200).json({
@@ -193,6 +199,9 @@ exports.resetNewPassword = async (req, res, next) => {
     if (validator_1.default.isEmpty(newPassword)) {
         return next(new http_error_1.default("Field can't be empty!", 422));
     }
+    if (!sanitize_html_1.default(newPassword)) {
+        return next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
+    }
     try {
         const user = await user_1.UserModel.findOne({ _id: req.params.userId }).exec();
         if (!user) {
@@ -229,6 +238,9 @@ exports.updateName = (req, res, next) => {
             message: "Name remain same!",
         });
     }
+    else if (!sanitize_html_1.default(name)) {
+        next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
+    }
     else if (!/^[A-Za-z\s.]+$/g.test(name)) {
         next(new http_error_1.default("Invalid name (Only required [a-z])!", 422));
     }
@@ -242,6 +254,7 @@ exports.updateName = (req, res, next) => {
             }
             res.status(201).json({
                 message: "User name updated successfully!",
+                updatedName: updatedUser.name,
             });
         });
     }
@@ -256,7 +269,8 @@ exports.updateAvatar = (req, res, next) => {
         }
         res.json({
             message: "User Avatar updated successfully!",
-            updateComment: updatedUser._id,
+            id: updatedUser._id,
+            updatedAvatar: updatedUser.avatar,
         });
     });
 };
@@ -268,6 +282,9 @@ exports.updateAddress = (req, res, next) => {
             message: "Address remain same!",
         });
     }
+    else if (!sanitize_html_1.default(address)) {
+        next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
+    }
     else {
         user_1.UserModel.findOneAndUpdate({ _id: req.userId }, { address: address }, (err, updatedUser) => {
             if (err) {
@@ -278,6 +295,7 @@ exports.updateAddress = (req, res, next) => {
             }
             res.status(201).json({
                 message: "User address updated successfully!",
+                updatedAddress: updatedUser.address
             });
         });
     }

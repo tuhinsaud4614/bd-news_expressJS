@@ -4,15 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const validator_1 = __importDefault(require("validator"));
+const sanitize_html_1 = __importDefault(require("sanitize-html"));
 const http_error_1 = __importDefault(require("../../model/http-error"));
 const user_1 = require("../../model/db/user");
 const news_1 = require("../../model/db/news");
-const validator_1 = __importDefault(require("validator"));
 exports.setFavorite = async (req, res, next) => {
     let { newsId } = req.body;
     newsId = newsId.trim();
     if (validator_1.default.isEmpty(newsId)) {
         return next(new http_error_1.default("News can't be empty!", 422));
+    }
+    if (!sanitize_html_1.default(newsId)) {
+        return next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
     }
     try {
         const user = await user_1.UserModel.findById(req.userId);

@@ -20,7 +20,7 @@ exports.getAllNews = async (_, res, next) => {
         return next(new http_error_1.default("Something went wrong!", 500));
     }
 };
-exports.removeNews = async (req, res, next) => {
+exports.removeNews = (req, res, next) => {
     news_1.NewsModel.findByIdAndDelete(req.params.newsId, (err, news) => {
         if (err) {
             return next(new http_error_1.default("News not deleted!", 400));

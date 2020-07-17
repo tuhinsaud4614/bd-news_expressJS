@@ -18,7 +18,7 @@ export const getAllNews: RequestHandler = async (_, res, next) => {
   }
 };
 
-export const removeNews: RequestHandler<{ newsId: string }> = async (
+export const removeNews: RequestHandler<{ newsId: string }> = (
   req,
   res,
   next
@@ -30,6 +30,7 @@ export const removeNews: RequestHandler<{ newsId: string }> = async (
     if (!news) {
       return next(new HttpError("Something went wrong!", 400));
     }
+    
     res.status(200).json({
       message: "News deleted successfully!",
       news: news._id,

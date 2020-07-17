@@ -1,7 +1,8 @@
 import { IComment } from "../../model/db/user";
 import { RequestHandler } from "express";
-import { startSession} from "mongoose";
+import { startSession } from "mongoose";
 import validator from "validator";
+import sanitizeHtml from "sanitize-html";
 
 import { UserModel, CommentModel } from "../../model/db/user";
 import { NewsModel } from "../../model/db/news";
@@ -41,6 +42,10 @@ export const createComment: RequestHandler = async (req, res, next) => {
 
   if (validator.isEmpty(text)) {
     return next(new HttpError("Comment text can't be empty!", 422));
+  }
+
+  if (!sanitizeHtml(text)) {
+    return next(new HttpError("Some malicious or invalid inputs found!", 422));
   }
 
   try {
@@ -88,6 +93,8 @@ export const editComment: RequestHandler<{ id: string }> = async (
       message: "Comment updated successfully!",
       updateComment: req.params.id,
     });
+  } else if (!sanitizeHtml(text)) {
+    return next(new HttpError("Some malicious or invalid inputs found!", 422));
   } else {
     CommentModel.findOneAndUpdate(
       { _id: req.params.id, commenter: req.userId! },

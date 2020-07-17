@@ -1,10 +1,11 @@
 import { RequestHandler } from "express";
 import { startSession } from "mongoose";
+import validator from "validator";
+import sanitizeHtml from 'sanitize-html';
 
 import HttpError from "../../model/http-error";
 import { UserModel, FavoriteModel } from "../../model/db/user";
 import { NewsModel } from "../../model/db/news";
-import validator from "validator";
 
 export const setFavorite: RequestHandler = async (req, res, next) => {
   let { newsId } = req.body as {
@@ -15,6 +16,10 @@ export const setFavorite: RequestHandler = async (req, res, next) => {
 
   if (validator.isEmpty(newsId)) {
     return next(new HttpError("News can't be empty!", 422));
+  }
+
+  if (!sanitizeHtml(newsId)) {
+    return next(new HttpError("Some malicious or invalid inputs found!", 422));
   }
 
   try {

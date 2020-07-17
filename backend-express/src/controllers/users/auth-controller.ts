@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import { hash, compare } from "bcryptjs";
 import { sign as jwtSign } from "jsonwebtoken";
-import validator from "validator";
 import { createTransport } from "nodemailer";
+import validator from "validator";
+import sanitizeHtml from "sanitize-html";
 
 import { UserModel } from "../../model/db/user";
 import HttpError from "../../model/http-error";
@@ -33,6 +34,10 @@ export const createUser: RequestHandler = async (req, res, next) => {
     validator.isEmpty(password)
   ) {
     return next(new HttpError("Field can't be empty!", 422));
+  }
+
+  if (!sanitizeHtml(name) || !sanitizeHtml(email) || !sanitizeHtml(password)) {
+    return next(new HttpError("Some malicious or invalid inputs found!", 422));
   }
 
   if (!/^[A-Za-z\s]+$/g.test(name)) {
@@ -98,6 +103,8 @@ export const login: RequestHandler = async (req, res, next) => {
           {
             name: currentUser.name,
             email: currentUser.email,
+            avatar: currentUser.avatar,
+            address: currentUser.address,
             id: currentUser._id,
           },
           process.env.SECRET_OR_KEY || "supersecret",
@@ -239,6 +246,10 @@ export const resetNewPassword: RequestHandler<{ userId: string }> = async (
     return next(new HttpError("Field can't be empty!", 422));
   }
 
+  if (!sanitizeHtml(newPassword)) {
+    return next(new HttpError("Some malicious or invalid inputs found!", 422));
+  }
+
   try {
     const user = await UserModel.findOne({ _id: req.params.userId }).exec();
 
@@ -278,6 +289,8 @@ export const updateName: RequestHandler = (req, res, next) => {
     res.status(200).json({
       message: "Name remain same!",
     });
+  } else if (!sanitizeHtml(name)) {
+    next(new HttpError("Some malicious or invalid inputs found!", 422));
   } else if (!/^[A-Za-z\s.]+$/g.test(name)) {
     next(new HttpError("Invalid name (Only required [a-z])!", 422));
   } else {
@@ -295,6 +308,7 @@ export const updateName: RequestHandler = (req, res, next) => {
 
         res.status(201).json({
           message: "User name updated successfully!",
+          updatedName: updatedUser.name,
         });
       }
     );
@@ -314,7 +328,8 @@ export const updateAvatar: RequestHandler = (req, res, next) => {
       }
       res.json({
         message: "User Avatar updated successfully!",
-        updateComment: updatedUser._id,
+        id: updatedUser._id,
+        updatedAvatar: updatedUser.avatar,
       });
     }
   );
@@ -328,6 +343,8 @@ export const updateAddress: RequestHandler = (req, res, next) => {
     res.status(200).json({
       message: "Address remain same!",
     });
+  } else if (!sanitizeHtml(address)) {
+    next(new HttpError("Some malicious or invalid inputs found!", 422));
   } else {
     UserModel.findOneAndUpdate(
       { _id: req.userId },
@@ -343,6 +360,7 @@ export const updateAddress: RequestHandler = (req, res, next) => {
 
         res.status(201).json({
           message: "User address updated successfully!",
+          updatedAddress: updatedUser.address
         });
       }
     );

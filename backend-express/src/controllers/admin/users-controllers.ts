@@ -1,7 +1,10 @@
+import { unlinkSync } from "fs";
+import { join } from "path";
 import { RequestHandler } from "express";
 
 import { UserModel } from "./../../model/db/user";
 import HttpError from "../../model/http-error";
+import { rootPath } from "../../utility";
 
 export const getAllUsers: RequestHandler = async (_, res, next) => {
   try {
@@ -18,7 +21,7 @@ export const getAllUsers: RequestHandler = async (_, res, next) => {
   }
 };
 
-export const removeUser: RequestHandler<{ userId: string }> = async (
+export const removeUser: RequestHandler<{ userId: string }> = (
   req,
   res,
   next
@@ -29,6 +32,11 @@ export const removeUser: RequestHandler<{ userId: string }> = async (
     }
     if (!user) {
       return next(new HttpError("Something went wrong!", 400));
+    }
+    if (user.avatar) {
+      unlinkSync(
+        join(rootPath, "public", user.avatar)
+      );
     }
     res.status(200).json({
       message: "User deleted successfully!",

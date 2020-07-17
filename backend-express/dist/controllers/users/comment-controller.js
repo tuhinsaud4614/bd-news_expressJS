@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const validator_1 = __importDefault(require("validator"));
+const sanitize_html_1 = __importDefault(require("sanitize-html"));
 const user_1 = require("../../model/db/user");
 const news_1 = require("../../model/db/news");
 const http_error_1 = __importDefault(require("../../model/http-error"));
@@ -33,6 +34,9 @@ exports.createComment = async (req, res, next) => {
     text = text.replace(/\s+/, " ").trim();
     if (validator_1.default.isEmpty(text)) {
         return next(new http_error_1.default("Comment text can't be empty!", 422));
+    }
+    if (!sanitize_html_1.default(text)) {
+        return next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
     }
     try {
         const user = await user_1.UserModel.findById(req.userId);
@@ -70,6 +74,9 @@ exports.editComment = async (req, res, next) => {
             message: "Comment updated successfully!",
             updateComment: req.params.id,
         });
+    }
+    else if (!sanitize_html_1.default(text)) {
+        return next(new http_error_1.default("Some malicious or invalid inputs found!", 422));
     }
     else {
         user_1.CommentModel.findOneAndUpdate({ _id: req.params.id, commenter: req.userId }, { text: text }, (err, updatedComment) => {

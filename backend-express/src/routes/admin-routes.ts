@@ -1,3 +1,7 @@
+import {
+  getAllComments,
+  removeComment,
+} from "./../controllers/admin/comment-controllers";
 import { removeUser } from "./../controllers/admin/users-controllers";
 import { isAdminAuth } from "./../middleware/is-auth";
 import { Router } from "express";
@@ -14,11 +18,16 @@ router.post("/login", login);
 // GET /api/admin/users
 router.get("/users", isAdminAuth, getAllUsers);
 // DELETE /api/admin/user:userId
-router.delete("/user/:userId", isAdminAuth, removeUser);
+router.delete("/users/:userId", isAdminAuth, removeUser);
 
 // GET /api/admin/newsies
 router.get("/newsies", getAllNews);
 // DELETE /api/admin/news:userId
-router.delete("/news/:newsId", isAdminAuth, removeNews);
+router.delete("/newsies/:newsId", isAdminAuth, removeNews);
+
+// GET /api/admin/comments
+router.get("/comments", getAllComments);
+// DELETE /api/admin/news:userId
+router.delete("/comments/:commentId", isAdminAuth, removeComment);
 
 export default router;
