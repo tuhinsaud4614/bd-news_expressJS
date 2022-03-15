@@ -12,8 +12,8 @@ import HttpError from "../../model/http-error";
 const transporter = createTransport({
   service: "gmail",
   auth: {
-    user: "choykuri.python3@gmail.com",
-    pass: "t01738518953",
+    user: "t@gmail.com",
+    pass: "gghgg",
   },
 });
 
